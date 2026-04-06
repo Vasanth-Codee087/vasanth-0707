@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucifer | Space Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050510;
+            --primary: #00f3ff;
+            --secondary: #bc13fe;
+            --text-main: #ffffff;
+            --text-muted: #a0a0b0;
+            --glass-bg: rgba(10, 10, 25, 0.6);
+            --glass-border: rgba(0, 243, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Canvas Background */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary);
+            text-decoration: none;
+            letter-spacing: 2px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav ul li a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 1rem;
+            transition: color 0.3s, text-shadow 0.3s;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        nav ul li a:hover {
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        /* Hero Section */
+        #hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .profile-container {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            margin-bottom: 30px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            box-shadow: 0 0 30px var(--primary), inset 0 0 20px var(--primary);
+            position: relative;
+            z-index: 2;
+        }
+
+        .orbit-ring {
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            right: -20px;
+            bottom: -20px;
+            border: 2px dashed var(--secondary);
+            border-radius: 50%;
+            animation: spin 15s linear infinite;
+            z-index: 1;
+            opacity: 0.6;
+            box-shadow: 0 0 20px rgba(188, 19, 254, 0.3);
+        }
+
+        .orbit-ring::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .hero-title {
+            font-size: 4.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+            letter-spacing: 4px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            height: 40px;
+            color: var(--text-main);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .hero-tagline {
+            font-size: 1.2rem;
+            font-style: italic;
+            margin-bottom: 40px;
+            color: var(--text-muted);
+            max-width: 600px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 35px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary);
+            color: #000;
+            box-shadow: 0 0 30px var(--primary);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--secondary);
+            border: 2px solid var(--secondary);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: var(--secondary);
+            color: #fff;
+            box-shadow: 0 0 30px var(--secondary);
+        }
+
+        /* Sections General */
+        section {
+            padding: 120px 10vw;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .section-title {
+            font-size: 3.5rem;
+            margin-bottom: 60px;
+            text-align: center;
+            color: var(--primary);
+            text-shadow: 0 0 15px var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Glass Card */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: skewX(-20deg);
+            transition: 0.5s;
+        }
+
+        .glass-card:hover::before {
+            left: 150%;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 243, 255, 0.2);
+            border-color: var(--primary);
+        }
+
+        /* About Section */
+        #about .glass-card {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 1.3rem;
+            line-height: 1.8;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        /* Skills Section */
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .skill-card {
+            background: rgba(10, 10, 25, 0.8);
+            border: 1px solid var(--secondary);
+            padding: 15px 35px;
+            border-radius: 30px;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--text-main);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.2);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        .skill-card:hover {
+            background: var(--secondary);
+            color: #fff;
+            box-shadow: 0 0 25px var(--secondary);
+            transform: scale(1.1) rotate(2deg);
+        }
+
+        /* Projects Section */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
+        }
+
+        .project-card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .project-title {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
+        .project-desc {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            flex-grow: 1;
+            line-height: 1.6;
+        }
+
+        .project-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .project-links a {
+            font-size: 0.9rem;
+            padding: 10px 20px;
+            flex: 1;
+            text-align: center;
+        }
+
+        /* Experience Section */
+        .timeline {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            box-shadow: 0 0 15px var(--primary);
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            display: flex;
+            justify-content: flex-end;
+            padding-right: 50%;
+            position: relative;
+            margin-bottom: 50px;
+        }
+
+        .timeline-item:nth-child(even) {
+            justify-content: flex-start;
+            padding-right: 0;
+            padding-left: 50%;
+        }
+
+        .timeline-content {
+            width: 85%;
+            padding: 30px;
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            background: var(--bg-color);
+            border: 3px solid var(--primary);
+            border-radius: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 15px var(--primary);
+            z-index: 1;
+            transition: all 0.3s;
+        }
+        
+        .timeline-item:hover::after {
+            background: var(--primary);
+            box-shadow: 0 0 25px var(--primary);
+            transform: translateX(-50%) scale(1.2);
+        }
+
+        /* Contact Section */
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.2rem;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            transition: background 0.3s;
+        }
+        
+        .contact-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .contact-item a {
+            color: var(--text-main);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .contact-item a:hover {
+            color: var(--primary);
+            text-shadow: 0 0 8px var(--primary);
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .contact-form input, .contact-form textarea {
+            width: 100%;
+            padding: 18px;
+            background: rgba(10, 10, 25, 0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .contact-form input:focus, .contact-form textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+            background: rgba(10, 10, 25, 0.8);
+        }
+
+        .contact-form textarea {
+            height: 180px;
+            resize: none;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px;
+            border-top: 1px solid var(--glass-border);
+            background: rgba(5, 5, 16, 0.8);
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(80px);
+            transition: all 1s cubic-bezier(0.5, 0, 0, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .contact-container { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 20px; }
+            nav ul { display: none; }
+            .hero-title { font-size: 3rem; }
+            .hero-subtitle { font-size: 1.2rem; }
+            .section-title { font-size: 2.5rem; }
+            .timeline::before { left: 30px; }
+            .timeline-item { padding-right: 0; padding-left: 70px; justify-content: flex-start; }
+            .timeline-item:nth-child(even) { padding-left: 70px; }
+            .timeline-item::after { left: 30px; }
+            .timeline-content { width: 100%; }
+            .btn-group { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="starfield"></canvas>
+
+    <nav>
+        <a href="#hero" class="logo">LUCIFER</a>
+        <ul>
+            <li><a href="#about">Mission Log</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#projects">Missions</a></li>
+            <li><a href="#experience">Journey</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <section id="hero">
+        <div class="profile-container" id="parallax-profile">
+            <div class="orbit-ring"></div>
+            <img src="https://i.ibb.co/MD80dcGW/image.jpg" alt="Lucifer" class="profile-img" onerror="this.src='https://picsum.photos/seed/spaceavatar/300/300?blur=2'">
+        </div>
+        <h1 class="hero-title">LUCIFER</h1>
+        <div class="hero-subtitle orbitron" id="typing-text"></div>
+        <p class="hero-tagline">"Exploring technology like a journey through space"</p>
+        <div class="btn-group">
+            <a href="#projects" class="btn btn-primary">Launch Projects</a>
+            <a href="#contact" class="btn btn-secondary">Contact Mission</a>
+        </div>
+    </section>
+
+    <section id="about" class="reveal">
+        <h2 class="section-title">Mission Log</h2>
+        <div class="glass-card">
+            <p>I am a BCA final year student focused on building real-world applications. I specialize in Java, web development, and modern deployment tools. I believe in execution, not just theory.</p>
+        </div>
+    </section>
+
+    <section id="skills" class="reveal">
+        <h2 class="section-title">Tech Arsenal</h2>
+        <div class="skills-container">
+            <div class="skill-card">Java</div>
+            <div class="skill-card">HTML, CSS, JavaScript</div>
+            <div class="skill-card">Web Development</div>
+            <div class="skill-card">Firebase Deployment</div>
+            <div class="skill-card">GitHub</div>
+            <div class="skill-card">Problem Solving</div>
+            <div class="skill-card">UI/UX Basics</div>
+            <div class="skill-card">Excel & AI Tools</div>
+        </div>
+    </section>
+
+    <section id="projects" class="reveal">
+        <h2 class="section-title">Active Missions</h2>
+        <div class="projects-grid">
+            <div class="glass-card project-card">
+                <h3 class="project-title orbitron">Project Alpha</h3>
+                <p class="project-desc">A futuristic web application built with modern web technologies and deployed on Firebase. Features real-time data sync and glassmorphism UI.</p>
+                <div class="project-links">
+                    <a href="#" class="btn btn-primary">Live Demo</a>
+                    <a href="#" class="btn btn-secondary">Source Code</a>
+                </div>
+            </div>
+            <div class="glass-card project-card">
+                <h3 class="project-title orbitron">Java Core System</h3>
+                <p class="project-desc">Robust backend system demonstrating advanced problem-solving and algorithmic efficiency. Built with multi-threading and socket programming.</p>
+                <div class="project-links">
+                    <a href="#" class="btn btn-primary">Live Demo</a>
+                    <a href="#" class="btn btn-secondary">Source Code</a>
+                </div>
+            </div>
+            <div class="glass-card project-card">
+                <h3 class="project-title orbitron">UI/UX Prototype</h3>
+                <p class="project-desc">Immersive user interface design focusing on glassmorphism, futuristic aesthetics, and seamless user experience across devices.</p>
+                <div class="project-links">
+                    <a href="#" class="btn btn-primary">Live Demo</a>
+                    <a href="#" class="btn btn-secondary">Source Code</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="experience" class="reveal">
+        <h2 class="section-title">Journey Path</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="glass-card timeline-content">
+                    <h3 class="orbitron" style="color: var(--primary); margin-bottom: 10px;">BCA Final Year</h3>
+                    <p>Currently pursuing Bachelor of Computer Applications, focusing on practical implementations, software engineering principles, and advanced computing concepts.</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="glass-card timeline-content">
+                    <h3 class="orbitron" style="color: var(--secondary); margin-bottom: 10px;">Web Development</h3>
+                    <p>Mastered frontend technologies and modern deployment workflows. Built responsive, interactive, and high-performance web applications.</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="glass-card timeline-content">
+                    <h3 class="orbitron" style="color: var(--primary); margin-bottom: 10px;">Java Programming</h3>
+                    <p>Developed strong core programming and problem-solving skills. Created complex backend systems and algorithms.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="reveal">
+        <h2 class="section-title">Establish Contact</h2>
+        <div class="contact-container">
+            <div class="glass-card contact-info">
+                <h3 class="orbitron" style="margin-bottom: 30px; color: var(--primary); font-size: 1.8rem;">Comm Links</h3>
+                <div class="contact-item">
+                    <span style="color: var(--secondary); font-weight: 600; width: 100px;">Email:</span>
+                    <a href="mailto:contact@lucifer.space">contact@lucifer.space</a>
+                </div>
+                <div class="contact-item">
+                    <span style="color: var(--secondary); font-weight: 600; width: 100px;">GitHub:</span>
+                    <a href="#" target="_blank">github.com/lucifer</a>
+                </div>
+                <div class="contact-item">
+                    <span style="color: var(--secondary); font-weight: 600; width: 100px;">Instagram:</span>
+                    <a href="#" target="_blank">@lucifer.tech</a>
+                </div>
+            </div>
+            <div class="glass-card">
+                <form class="contact-form" onsubmit="event.preventDefault(); alert('Transmission Successful! Mission Control will respond shortly.');">
+                    <input type="text" placeholder="Your Designation (Name)" required>
+                    <input type="email" placeholder="Your Frequency (Email)" required>
+                    <textarea placeholder="Transmit Message..." required></textarea>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Send Transmission</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p class="orbitron" style="color: var(--text-muted); letter-spacing: 2px;">© Lucifer | Space Portfolio</p>
+    </footer>
+
+    <script>
+        // Starfield Canvas Animation
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let stars = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Star {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.z = Math.random() * width;
+                this.size = Math.random() * 1.5;
+                this.speed = Math.random() * 2 + 0.5;
+            }
+            update() {
+                this.z -= this.speed;
+                if (this.z <= 0) {
+                    this.z = width;
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                }
+            }
+            draw() {
+                let x = (this.x - width / 2) * (width / this.z) + width / 2;
+                let y = (this.y - height / 2) * (width / this.z) + height / 2;
+                let s = this.size * (width / this.z);
+                
+                ctx.beginPath();
+                ctx.arc(x, y, s, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${1 - this.z / width})`;
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 1000; i++) {
+            stars.push(new Star());
+        }
+
+        function animateStars() {
+            ctx.fillStyle = 'rgba(5, 5, 16, 0.8)';
+            ctx.fillRect(0, 0, width, height);
+            stars.forEach(star => {
+                star.update();
+                star.draw();
+            });
+            requestAnimationFrame(animateStars);
+        }
+        animateStars();
+
+        // Typing Effect
+        const roles = ["Java Developer", "Web Developer", "Tech Innovator"];
+        let roleIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        const typingElement = document.getElementById('typing-text');
+
+        function type() {
+            const currentRole = roles[roleIndex];
+            if (isDeleting) {
+                typingElement.textContent = currentRole.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typingElement.textContent = currentRole.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            let typeSpeed = isDeleting ? 50 : 100;
+
+            if (!isDeleting && charIndex === currentRole.length) {
+                typeSpeed = 2000;
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                roleIndex = (roleIndex + 1) % roles.length;
+                typeSpeed = 500;
+            }
+
+            setTimeout(type, typeSpeed);
+        }
+        type();
+
+        // Scroll Reveal
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        reveal(); // Trigger on load
+
+        // Mouse Parallax Effect for Profile
+        document.addEventListener('mousemove', (e) => {
+            const profile = document.getElementById('parallax-profile');
+            const x = (window.innerWidth / 2 - e.pageX) / 40;
+            const y = (window.innerHeight / 2 - e.pageY) / 40;
+            profile.style.transform = `translate(${x}px, ${y}px)`;
+        });
+        
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.style.background = 'rgba(5, 5, 16, 0.9)';
+                nav.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.5)';
+            } else {
+                nav.style.background = 'rgba(10, 10, 25, 0.6)';
+                nav.style.boxShadow = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
